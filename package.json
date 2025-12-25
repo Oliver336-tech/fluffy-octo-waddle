@@ -1,0 +1,13 @@
+{
+  "name": "fluffy-octo-waddle",
+  "version": "1.0.0",
+  "description": "Git utilities",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "node scripts/run-tests.js"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}
