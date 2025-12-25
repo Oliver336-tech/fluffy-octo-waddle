@@ -120,4 +120,22 @@ describe('initRepo', () => {
 
     assert.deepStrictEqual(result, { head: 'def456', branch: 'main', hasCommit: true });
   });
+
+  it('surfaces unexpected rev-parse errors', async () => {
+    const repoPath = '/tmp/error-repo';
+    const failure = Object.assign(new Error('boom'), { stderr: 'fatal: boom' });
+    plans.push(
+      {}, // git init
+      {}, // git config
+      { error: failure }, // rev-parse --verify HEAD
+    );
+
+    await assert.rejects(() => initRepo(repoPath, { initialCommit: true }), failure);
+
+    assert.deepStrictEqual(calls, [
+      { cmd: 'git', args: ['init'], cwd: path.resolve(repoPath) },
+      { cmd: 'git', args: ['config', '--local', '--add', 'safe.directory', path.resolve(repoPath)], cwd: path.resolve(repoPath) },
+      { cmd: 'git', args: ['rev-parse', '--verify', 'HEAD'], cwd: path.resolve(repoPath) },
+    ]);
+  });
 });

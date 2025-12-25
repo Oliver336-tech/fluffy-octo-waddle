@@ -24,7 +24,11 @@ function execGit(args: string[], cwd: string): Promise<ExecResult> {
   return new Promise((resolve, reject) => {
     execFile('git', args, { cwd }, (error: Error | null, stdout?: string | Buffer, stderr?: string | Buffer) => {
       if (error) {
-        return reject(Object.assign(error, { stdout: String(stdout), stderr: String(stderr) }));
+        const enriched = Object.assign(error, {
+          stdout: (error as { stdout?: string }).stdout ?? String(stdout ?? ''),
+          stderr: (error as { stderr?: string }).stderr ?? String(stderr ?? ''),
+        });
+        return reject(enriched);
       }
       resolve({ stdout: String(stdout), stderr: String(stderr) });
     });
@@ -36,10 +40,14 @@ async function hasExistingCommit(cwd: string): Promise<boolean> {
     await execGit(['rev-parse', '--verify', 'HEAD'], cwd);
     return true;
   } catch (error: unknown) {
-    if ((error as { stderr?: string }).stderr?.includes('Needed a single revision')) {
+    const stderr = (error as { stderr?: string }).stderr ?? '';
+    if (
+      stderr.includes('Needed a single revision') ||
+      stderr.includes('unknown revision or path not in the working tree')
+    ) {
       return false;
     }
-    return false;
+    throw error;
   }
 }
 
