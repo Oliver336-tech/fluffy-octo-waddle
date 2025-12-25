@@ -1,0 +1,12 @@
+{
+  "name": "fluffy-octo-waddle",
+  "version": "1.0.0",
+  "description": "Project scaffolding utilities and templates.",
+  "main": "dist/index.js",
+  "type": "commonjs",
+  "scripts": {
+    "build": "tsc --project tsconfig.json",
+    "test": "node ./scripts/run-tests.js"
+  },
+  "license": "MIT"
+}
